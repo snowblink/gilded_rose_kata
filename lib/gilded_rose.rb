@@ -1,26 +1,20 @@
 def update_quality(items)
   items.each do |item|
+    this_item = nil
+
     if normal_item?(item)
-      if item.quality > 0
-        item.quality -= 1
-      end
+      this_item = NormalItem.new(item)
+      this_item.decrease_quality
     else
       if item.quality < 50
         item.quality += 1
         if backstage_passes?(item)
-          if item.sell_in < 11
-            if item.quality < 50
-              item.quality += 1
-            end
-          end
-          if item.sell_in < 6
-            if item.quality < 50
-              item.quality += 1
-            end
-          end
+          this_item = BackstagePassItem.new(item)
+          this_item.decrease_quality
         end
       end
     end
+
     if !sulfuras?(item)
       item.sell_in -= 1
     end
@@ -43,6 +37,42 @@ def update_quality(items)
     end
   end
 end
+
+
+class NormalItem
+  attr_accessor :item
+  def initialize(item)
+    @item = item
+  end
+
+  def decrease_quality
+    if item.quality > 0
+      item.quality -= 1
+    end
+  end
+end
+
+class BackstagePassItem
+  attr_accessor :item
+  def initialize(item)
+    @item = item
+  end
+
+  def decrease_quality
+    if item.sell_in < 11
+      if item.quality < 50
+        item.quality += 1
+      end
+    end
+    if item.sell_in < 6
+      if item.quality < 50
+        item.quality += 1
+      end
+    end
+  end
+end
+
+
 
 def normal_item?(item)
   item.name == "NORMAL ITEM"
