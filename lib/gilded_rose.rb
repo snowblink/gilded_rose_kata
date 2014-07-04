@@ -1,10 +1,8 @@
 def update_quality(items)
   items.each do |item|
-    if !aged_brie?(item) && !backstage_passes?(item)
+    if normal_item?(item)
       if item.quality > 0
-        if !sulfuras?(item)
-          item.quality -= 1
-        end
+        item.quality -= 1
       end
     else
       if item.quality < 50
@@ -44,6 +42,10 @@ def update_quality(items)
       end
     end
   end
+end
+
+def normal_item?(item)
+  item.name == "NORMAL ITEM"
 end
 
 def aged_brie?(item)
