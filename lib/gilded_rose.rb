@@ -6,13 +6,30 @@ def update_quality(items)
     this_item = AgedBrie.new(item) if aged_brie?(item)
     this_item = Sulfuras.new(item) if sulfuras?(item)
 
-    raise "NO ITEM" unless this_item
+    this_item = Conjured.new(item) if conjured?(item)
 
     this_item.update_quality
     this_item.update_sell_in
   end
 end
 
+
+class Conjured
+  attr_accessor :item
+  def initialize(item)
+    @item = item
+  end
+
+  def update_quality
+    if item.quality > 0
+      item.quality -= 2
+    end
+  end
+
+  def update_sell_in
+    item.sell_in -= 1
+  end
+end
 
 class NormalItem
   attr_accessor :item
@@ -87,6 +104,10 @@ class Sulfuras
 
   def update_sell_in
   end
+end
+
+def conjured?(item)
+  item.name == "Conjured Mana Cake"
 end
 
 def normal_item?(item)
