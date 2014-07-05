@@ -4,3 +4,4 @@ gem "rspec"
 gem "rspec-given"
 
 gem "flog"
+gem "pry"

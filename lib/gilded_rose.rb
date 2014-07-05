@@ -1,40 +1,15 @@
 def update_quality(items)
   items.each do |item|
-    this_item = nil
 
-    if normal_item?(item)
-      this_item = NormalItem.new(item)
-      this_item.decrease_quality
-    else
-      if item.quality < 50
-        item.quality += 1
-        if backstage_passes?(item)
-          this_item = BackstagePassItem.new(item)
-          this_item.decrease_quality
-        end
-      end
-    end
+    this_item = NormalItem.new(item) if normal_item?(item)
+    this_item = BackstagePassItem.new(item) if backstage_passes?(item)
+    this_item = AgedBrie.new(item) if aged_brie?(item)
+    this_item = Sulfuras.new(item) if sulfuras?(item)
 
-    if !sulfuras?(item)
-      item.sell_in -= 1
-    end
-    if item.sell_in < 0
-      if !aged_brie?(item)
-        if !backstage_passes?(item)
-          if item.quality > 0
-            if !sulfuras?(item)
-              item.quality -= 1
-            end
-          end
-        else
-          item.quality = item.quality - item.quality
-        end
-      else
-        if item.quality < 50
-          item.quality += 1
-        end
-      end
-    end
+    raise "NO ITEM" unless this_item
+
+    this_item.update_quality
+    this_item.update_sell_in
   end
 end
 
@@ -45,8 +20,15 @@ class NormalItem
     @item = item
   end
 
-  def decrease_quality
+  def update_quality
     if item.quality > 0
+      item.quality -= 1
+    end
+  end
+
+  def update_sell_in
+    item.sell_in -= 1
+    if item.sell_in < 0
       item.quality -= 1
     end
   end
@@ -58,21 +40,54 @@ class BackstagePassItem
     @item = item
   end
 
-  def decrease_quality
+  def update_quality
+    item.quality += 1 if item.quality < 50
     if item.sell_in < 11
-      if item.quality < 50
-        item.quality += 1
-      end
+      item.quality += 1 if item.quality < 50
     end
     if item.sell_in < 6
-      if item.quality < 50
-        item.quality += 1
-      end
+      item.quality += 1 if item.quality < 50
+    end
+  end
+
+  def update_sell_in
+    item.sell_in -= 1
+    if item.sell_in < 0
+      item.quality = 0
     end
   end
 end
 
+class AgedBrie
+  attr_accessor :item
+  def initialize(item)
+    @item = item
+  end
 
+  def update_quality
+    item.quality += 1 if item.quality < 50
+  end
+
+  def update_sell_in
+    item.sell_in -= 1
+    if item.sell_in < 0
+      item.quality += 1 if item.quality < 50
+    end
+  end
+end
+
+class Sulfuras
+  attr_accessor :item
+  def initialize(item)
+    @item = item
+  end
+
+  def update_quality
+  end
+
+  def update_sell_in
+  end
+end
 
 def normal_item?(item)
   item.name == "NORMAL ITEM"
